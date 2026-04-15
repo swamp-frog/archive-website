@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scroll Grow Sequence</title>
+
+  <style>
+    * { box-sizing: border-box; }
+html {
+  background: white;
+}
+
+html {
+  background: white;
+}
+
+body {
+  opacity: 0;
+}
+
+body.start {
+  animation: pageFadeIn 2s ease-out forwards;
+}
+
+@keyframes pageFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+    html, body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .viewer {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .title {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgb(27, 27, 27);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+      font-size: 11vw;
+      font-family:;
+    }
+
+    .viewer img {
+      position: absolute;
+      z-index: 1;
+      width: 1vw;
+      max-width: 500vw;
+      transform: scale(0.01);
+      opacity: 0;
+      object-fit: cover;
+    }
+
+    #scrollSpace {
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .title { font-size: 17vw; }
+      .viewer img { width: 62vw; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="viewer">
+    <div id="title" class="title"></div>
+    <img id="image" src="" />
+  </div>
+
+  <div id="scrollSpace"></div>
+
+  <script>
+
+    window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.body.classList.add("start");
+  }, 500);
+});
+    const people = ["David", "Anna", "Mafalda", "Nazar" , "TaeYoung" , "Naeun" , "Jiwon" , "Sonya" , "Carina" , "Electra" , "Bink" , "Sjoerd" , "Amelia" , "Yeva" , "Yordana" , "laura", "alara", "timea" ];
+    const imagesPerPerson = 3; // 👈 how many images each has
+
+    const title = document.getElementById("title");
+    const image = document.getElementById("image");
+    const scrollSpace = document.getElementById("scrollSpace");
+
+    const growDistance = 5000;
+    const stagesPerPerson = imagesPerPerson + 1; // name + images
+    const totalStages = people.length * stagesPerPerson;
+
+    scrollSpace.style.height =
+      (totalStages * growDistance + window.innerHeight) + "px";
+
+    let currentImage = "";
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function update() {
+      const scroll = window.scrollY;
+      const stage = Math.floor(scroll / growDistance);
+      const safeStage = Math.min(stage, totalStages - 1);
+
+      const personIndex = Math.floor(safeStage / stagesPerPerson);
+      const stageInPerson = safeStage % stagesPerPerson;
+
+      const stageStart = safeStage * growDistance;
+      const progress = clamp(
+        (scroll - stageStart) / growDistance,
+        0,
+        1
+      );
+
+      let eased = easeInOutCubic(progress);
+
+// 🚀 strong acceleration at the end (no limit)
+if (progress > 0.7) {
+  const boost = (progress - 0.7) / 0.3;
+  eased += boost * 1.2; // push beyond 1 aggressively
+}
+
+      const name = people[personIndex];
+
+      // ✅ NAME STAGE
+      // ✅ NAME STAGE
+if (stageInPerson === 0) {
+  title.style.display = "flex";
+  title.textContent = name;
+
+  const baseSize = window.innerWidth * 0.006;
+  const maxSize = baseSize * 400;
+  const size = baseSize + (maxSize - baseSize) * eased;
+
+  title.style.fontSize = size + "px";
+
+  // ✅ always fully visible
+  let opacity = 1;
+
+  // ❌ NO FADE — hard cut instead
+  if (progress >= 0.98) {
+    opacity = 0;
+  }
+
+  title.style.opacity = opacity;
+
+  image.style.opacity = 0;
+  return;
+}
+
+      // ❌ hide title
+      title.style.display = "none";
+
+      // ✅ IMAGE STAGES
+      const imageIndex = stageInPerson;
+
+      const fileName =
+        name.toLowerCase() + imageIndex + ".png";
+
+      if (fileName !== currentImage) {
+        currentImage = fileName;
+        image.src = fileName;
+      }
+
+      const scale = 1 + eased * 100;
+
+      let opacity = 1;
+
+      if (progress < 0.08) {
+        opacity = progress / 0.08;
+      }
+
+      if (progress >= 0.98) {
+        opacity = 0;
+      }
+
+      image.style.opacity = clamp(opacity, 0, 1);
+      image.style.transform = `scale(${scale})`;
+    }
+
+    window.addEventListener("scroll", update);
+    update();
+  </script>
+</body>
+</html>
