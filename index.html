@@ -7,27 +7,24 @@
 
   <style>
     * { box-sizing: border-box; }
-html {
-  background: white;
-}
+    html {
+      background: white;
+    }
 
-html {
-  background: white;
-}
+    body {
+      opacity: 0;
+    }
 
-body {
-  opacity: 0;
-}
+    body.start {
+      animation: pageFadeIn 2s ease-out forwards;
+    }
 
-body.start {
-  animation: pageFadeIn 2s ease-out forwards;
-}
+    @keyframes pageFadeIn {
+      to {
+        opacity: 1;
+      }
+    }
 
-@keyframes pageFadeIn {
-  to {
-    opacity: 1;
-  }
-}
     html, body {
       margin: 0;
       overflow-x: hidden;
@@ -42,6 +39,13 @@ body.start {
       justify-content: center;
       overflow: hidden;
     }
+    
+@font-face {
+  font-family: 'MyCustomFont'; /* The name you will use in your CSS */
+  src: url('calgaryscriptot.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
 
     .title {
       position: absolute;
@@ -56,7 +60,7 @@ body.start {
       pointer-events: none;
       z-index: 2;
       font-size: 11vw;
-      font-family:;
+      font-family: 'MyCustomFont';
     }
 
     .viewer img {
@@ -89,15 +93,164 @@ body.start {
   <div id="scrollSpace"></div>
 
   <script>
+// window.addEventListener("load", () => {
+//   // Define a function to generate a random bright color
+//   function getRandomBrightColor() {
+//     const r = Math.floor(Math.random() * 156) + 100; // Ranges from 100 to 255 for bright colors
+//     const g = Math.floor(Math.random() * 156) + 100; // Same range for green
+//     const b = Math.floor(Math.random() * 156) + 100; // Same range for blue
+//     return `rgb(${r}, ${g}, ${b})`;
+//   }
+
+//   // Loop through each person and apply a unique bright color to the title
+//   const title = document.getElementById("title");
+//   const name = title.textContent; // Get the name displayed
+
+//   // Set the title color randomly
+//   title.style.color = getRandomBrightColor();
+// });
+  
+
+
+
+
+
+
+// window.addEventListener("load", () => {
+//   // Define a function to generate a random bright color
+//   function getRandomBrightColor() {
+//     const r = Math.floor(Math.random() * 156) + 100; // Ranges from 100 to 255 for bright colors
+//     const g = Math.floor(Math.random() * 156) + 100; // Same range for green
+//     const b = Math.floor(Math.random() * 156) + 100; // Same range for blue
+//     return `rgb(${r}, ${g}, ${b})`;
+//   }
+
+//   // Create a map of names and their corresponding random colors
+//   const nameColors = {};
+
+//   people.forEach(name => {
+//     nameColors[name] = getRandomBrightColor(); // Assign a random color to each name
+//   });
+
+//   // Modify the title style to use the color for the current name
+//   function update() {
+//     const scroll = window.scrollY;
+//     const stage = Math.floor(scroll / growDistance);
+//     const safeStage = Math.min(stage, totalStages - 1);
+
+//     const personIndex = Math.floor(safeStage / stagesPerPerson);
+//     const stageInPerson = safeStage % stagesPerPerson;
+
+//     const name = people[personIndex];
+
+//     // Set the title color to the corresponding random color for the name
+//     title.style.color = nameColors[name];
+
+//     // Existing code to update the title and image
+//     const stageStart = safeStage * growDistance;
+//     const progress = clamp(
+//       (scroll - stageStart) / growDistance,
+//       0,
+//       1
+//     );
+
+//     let eased = easeInOutCubic(progress);
+
+//     // 🚀 strong acceleration at the end (no limit)
+//     if (progress > 0.7) {
+//       const boost = (progress - 0.7) / 0.3;
+//       eased += boost * 1.2; // push beyond 1 aggressively
+//     }
+
+//     // ✅ NAME STAGE
+//     if (stageInPerson === 0) {
+//       title.style.display = "flex";
+//       title.textContent = name;
+
+//       const baseSize = window.innerWidth * 0.006;
+//       const maxSize = baseSize * 400;
+//       const size = baseSize + (maxSize - baseSize) * eased;
+
+//       title.style.fontSize = size + "px";
+
+//       let opacity = 1;
+
+//       if (progress >= 0.98) {
+//         opacity = 0;
+//       }
+
+//       title.style.opacity = opacity;
+
+//       image.style.opacity = 0;
+//       return;
+//     }
+
+//     // ❌ hide title
+//     title.style.display = "none";
+
+//     // ✅ IMAGE STAGES
+//     const imageIndex = stageInPerson;
+
+//     const fileName =
+//       name.toLowerCase() + imageIndex + ".png";
+
+//     if (fileName !== currentImage) {
+//       currentImage = fileName;
+//       image.src = fileName;
+//     }
+
+//     const scale = 1 + eased * 100;
+
+//     let opacity = 1;
+
+//     if (progress < 0.08) {
+//       opacity = progress / 0.08;
+//     }
+
+//     if (progress >= 0.98) {
+//       opacity = 0;
+//     }
+
+//     image.style.opacity = clamp(opacity, 0, 1);
+//     image.style.transform = `scale(${scale})`;
+//   }
+
+//   window.addEventListener("scroll", update);
+//   update();
+// });
+
+
+
+
+
+
+
+
+
 
     window.addEventListener("load", () => {
   setTimeout(() => {
     document.body.classList.add("start");
   }, 500);
-});
-    const people = ["David", "Anna", "Mafalda", "Nazar" , "TaeYoung" , "Naeun" , "Jiwon" , "Sonya" , "Carina" , "Electra" , "Bink" , "Sjoerd" , "Amelia" , "Yeva" , "Yordana" , "Laura", "Alara", "Timea" ];
-    const imagesPerPerson = 3; // 👈 how many images each has
 
+  // Ensure the scroll position starts at the top
+  window.scrollTo(0, 0);
+});
+
+    const people = ["David", "Anna", "Mafalda", "Nazar" , "TaeYoung" , "Naeun" , "Jiwon" , "Sonya" , "Carina" , "Electra" , "Bink" , "Sjoerd" , "Amelia" , "Yeva" , "Yordana" , "Laura", "Alara", "Timea"];
+
+    // Function to shuffle the people array
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
+      }
+    }
+
+    // Shuffle the people array on page load
+    shuffleArray(people);
+
+    const imagesPerPerson = 3; // 👈 how many images each has
     const title = document.getElementById("title");
     const image = document.getElementById("image");
     const scrollSpace = document.getElementById("scrollSpace");
@@ -138,39 +291,36 @@ body.start {
 
       let eased = easeInOutCubic(progress);
 
-// 🚀 strong acceleration at the end (no limit)
-if (progress > 0.7) {
-  const boost = (progress - 0.7) / 0.3;
-  eased += boost * 1.2; // push beyond 1 aggressively
-}
+      // 🚀 strong acceleration at the end (no limit)
+      if (progress > 0.7) {
+        const boost = (progress - 0.7) / 0.3;
+        eased += boost * 1.2; // push beyond 1 aggressively
+      }
 
       const name = people[personIndex];
 
       // ✅ NAME STAGE
-      // ✅ NAME STAGE
-if (stageInPerson === 0) {
-  title.style.display = "flex";
-  title.textContent = name;
+      if (stageInPerson === 0) {
+        title.style.display = "flex";
+        title.textContent = name;
 
-  const baseSize = window.innerWidth * 0.006;
-  const maxSize = baseSize * 400;
-  const size = baseSize + (maxSize - baseSize) * eased;
+        const baseSize = window.innerWidth * 0.006;
+        const maxSize = baseSize * 400;
+        const size = baseSize + (maxSize - baseSize) * eased;
 
-  title.style.fontSize = size + "px";
+        title.style.fontSize = size + "px";
 
-  // ✅ always fully visible
-  let opacity = 1;
+        let opacity = 1;
 
-  // ❌ NO FADE — hard cut instead
-  if (progress >= 0.98) {
-    opacity = 0;
-  }
+        if (progress >= 0.98) {
+          opacity = 0;
+        }
 
-  title.style.opacity = opacity;
+        title.style.opacity = opacity;
 
-  image.style.opacity = 0;
-  return;
-}
+        image.style.opacity = 0;
+        return;
+      }
 
       // ❌ hide title
       title.style.display = "none";
