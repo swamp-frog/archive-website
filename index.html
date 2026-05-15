@@ -6,12 +6,18 @@
   <title>Scroll Grow Sequence</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     html {
       background: white;
     }
 
     body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: Arial, Helvetica, sans-serif;
       opacity: 0;
     }
 
@@ -25,12 +31,6 @@
       }
     }
 
-    html, body {
-      margin: 0;
-      overflow-x: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
     .viewer {
       position: fixed;
       inset: 0;
@@ -39,13 +39,13 @@
       justify-content: center;
       overflow: hidden;
     }
-    
-@font-face {
-  font-family: 'MyCustomFont'; /* The name you will use in your CSS */
-  src: url('calgaryscriptot.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
+
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url('calgaryscriptot.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
 
     .title {
       position: absolute;
@@ -78,13 +78,19 @@
     }
 
     @media (max-width: 900px) {
-      .title { font-size: 17vw; }
-      .viewer img { width: 62vw; }
+      .title {
+        font-size: 17vw;
+      }
+
+      .viewer img {
+        width: 62vw;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <div class="viewer">
     <div id="title" class="title"></div>
     <img id="image" src="" />
@@ -93,267 +99,279 @@
   <div id="scrollSpace"></div>
 
   <script>
-// window.addEventListener("load", () => {
-//   // Define a function to generate a random bright color
-//   function getRandomBrightColor() {
-//     const r = Math.floor(Math.random() * 156) + 100; // Ranges from 100 to 255 for bright colors
-//     const g = Math.floor(Math.random() * 156) + 100; // Same range for green
-//     const b = Math.floor(Math.random() * 156) + 100; // Same range for blue
-//     return `rgb(${r}, ${g}, ${b})`;
-//   }
+    window.addEventListener("load", async () => {
 
-//   // Loop through each person and apply a unique bright color to the title
-//   const title = document.getElementById("title");
-//   const name = title.textContent; // Get the name displayed
+      setTimeout(() => {
+        document.body.classList.add("start");
+      }, 500);
 
-//   // Set the title color randomly
-//   title.style.color = getRandomBrightColor();
-// });
-  
+      window.scrollTo(0, 0);
 
+      // =========================================================
+      // PEOPLE
+      // =========================================================
 
+      const people = [
+        "David",
+        "Anna",
+        "Mafalda",
+        "Nazar",
+        "TaeYoung",
+        "Naeun",
+        "Jiwon",
+        "Sonya",
+        "Carina",
+        "Electra",
+        "Bink",
+        "Sjoerd",
+        "Amelia",
+        "Yeva",
+        "Yordana",
+        "Laura",
+        "Alara",
+        "Timea"
+      ];
 
+      // Shuffle people
+      shuffleArray(people);
 
+      // =========================================================
+      // DOM
+      // =========================================================
 
+      const title = document.getElementById("title");
+      const image = document.getElementById("image");
+      const scrollSpace = document.getElementById("scrollSpace");
 
-// window.addEventListener("load", () => {
-//   // Define a function to generate a random bright color
-//   function getRandomBrightColor() {
-//     const r = Math.floor(Math.random() * 156) + 100; // Ranges from 100 to 255 for bright colors
-//     const g = Math.floor(Math.random() * 156) + 100; // Same range for green
-//     const b = Math.floor(Math.random() * 156) + 100; // Same range for blue
-//     return `rgb(${r}, ${g}, ${b})`;
-//   }
+      // =========================================================
+      // SETTINGS
+      // =========================================================
 
-//   // Create a map of names and their corresponding random colors
-//   const nameColors = {};
+      const growDistance = 5000;
 
-//   people.forEach(name => {
-//     nameColors[name] = getRandomBrightColor(); // Assign a random color to each name
-//   });
+      // =========================================================
+      // AUTO DETECT IMAGES
+      // =========================================================
 
-//   // Modify the title style to use the color for the current name
-//   function update() {
-//     const scroll = window.scrollY;
-//     const stage = Math.floor(scroll / growDistance);
-//     const safeStage = Math.min(stage, totalStages - 1);
+      /*
+        IMPORTANT:
 
-//     const personIndex = Math.floor(safeStage / stagesPerPerson);
-//     const stageInPerson = safeStage % stagesPerPerson;
+        Your files should be named like:
 
-//     const name = people[personIndex];
+        david1.webp
+        david2.webp
+        david3.webp
+        ...
 
-//     // Set the title color to the corresponding random color for the name
-//     title.style.color = nameColors[name];
+        anna1.webp
+        anna2.webp
+        ...
 
-//     // Existing code to update the title and image
-//     const stageStart = safeStage * growDistance;
-//     const progress = clamp(
-//       (scroll - stageStart) / growDistance,
-//       0,
-//       1
-//     );
+        The code automatically checks until
+        it no longer finds a file.
+      */
 
-//     let eased = easeInOutCubic(progress);
+      async function imageExists(src) {
+        return new Promise((resolve) => {
+          const img = new Image();
 
-//     // 🚀 strong acceleration at the end (no limit)
-//     if (progress > 0.7) {
-//       const boost = (progress - 0.7) / 0.3;
-//       eased += boost * 1.2; // push beyond 1 aggressively
-//     }
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
 
-//     // ✅ NAME STAGE
-//     if (stageInPerson === 0) {
-//       title.style.display = "flex";
-//       title.textContent = name;
-
-//       const baseSize = window.innerWidth * 0.006;
-//       const maxSize = baseSize * 400;
-//       const size = baseSize + (maxSize - baseSize) * eased;
-
-//       title.style.fontSize = size + "px";
-
-//       let opacity = 1;
-
-//       if (progress >= 0.98) {
-//         opacity = 0;
-//       }
-
-//       title.style.opacity = opacity;
-
-//       image.style.opacity = 0;
-//       return;
-//     }
-
-//     // ❌ hide title
-//     title.style.display = "none";
-
-//     // ✅ IMAGE STAGES
-//     const imageIndex = stageInPerson;
-
-//     const fileName =
-//       name.toLowerCase() + imageIndex + ".png";
-
-//     if (fileName !== currentImage) {
-//       currentImage = fileName;
-//       image.src = fileName;
-//     }
-
-//     const scale = 1 + eased * 100;
-
-//     let opacity = 1;
-
-//     if (progress < 0.08) {
-//       opacity = progress / 0.08;
-//     }
-
-//     if (progress >= 0.98) {
-//       opacity = 0;
-//     }
-
-//     image.style.opacity = clamp(opacity, 0, 1);
-//     image.style.transform = `scale(${scale})`;
-//   }
-
-//   window.addEventListener("scroll", update);
-//   update();
-// });
-
-
-
-
-
-
-
-
-
-
-    window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.body.classList.add("start");
-  }, 500);
-
-  // Ensure the scroll position starts at the top
-  window.scrollTo(0, 0);
-});
-
-    const people = ["David", "Anna", "Mafalda", "Nazar" , "TaeYoung" , "Naeun" , "Jiwon" , "Sonya" , "Carina" , "Electra" , "Bink" , "Sjoerd" , "Amelia" , "Yeva" , "Yordana" , "Laura", "Alara", "Timea"];
-
-    // Function to shuffle the people array
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap elements
-      }
-    }
-
-    // Shuffle the people array on page load
-    shuffleArray(people);
-
-    const imagesPerPerson = 3; // 👈 how many images each has
-    const title = document.getElementById("title");
-    const image = document.getElementById("image");
-    const scrollSpace = document.getElementById("scrollSpace");
-
-    const growDistance = 5000;
-    const stagesPerPerson = imagesPerPerson + 1; // name + images
-    const totalStages = people.length * stagesPerPerson;
-
-    scrollSpace.style.height =
-      (totalStages * growDistance + window.innerHeight) + "px";
-
-    let currentImage = "";
-
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function easeInOutCubic(t) {
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    function update() {
-      const scroll = window.scrollY;
-      const stage = Math.floor(scroll / growDistance);
-      const safeStage = Math.min(stage, totalStages - 1);
-
-      const personIndex = Math.floor(safeStage / stagesPerPerson);
-      const stageInPerson = safeStage % stagesPerPerson;
-
-      const stageStart = safeStage * growDistance;
-      const progress = clamp(
-        (scroll - stageStart) / growDistance,
-        0,
-        1
-      );
-
-      let eased = easeInOutCubic(progress);
-
-      // 🚀 strong acceleration at the end (no limit)
-      if (progress > 0.7) {
-        const boost = (progress - 0.7) / 0.3;
-        eased += boost * 1.2; // push beyond 1 aggressively
+          img.src = src;
+        });
       }
 
-      const name = people[personIndex];
+      async function getImagesForPerson(name) {
+        const files = [];
+        let index = 1;
 
-      // ✅ NAME STAGE
-      if (stageInPerson === 0) {
-        title.style.display = "flex";
-        title.textContent = name;
+        while (true) {
+          const fileName =
+            name.toLowerCase() + index + ".webp";
 
-        const baseSize = window.innerWidth * 0.006;
-        const maxSize = baseSize * 400;
-        const size = baseSize + (maxSize - baseSize) * eased;
+          const exists = await imageExists(fileName);
 
-        title.style.fontSize = size + "px";
+          if (!exists) break;
+
+          files.push(fileName);
+          index++;
+        }
+
+        return files;
+      }
+
+      // =========================================================
+      // BUILD SEQUENCE
+      // =========================================================
+
+      /*
+        Each stage becomes:
+
+        {
+          type: "title"
+        }
+
+        OR
+
+        {
+          type: "image",
+          src: "david1.webp"
+        }
+      */
+
+      const stages = [];
+
+      for (const person of people) {
+
+        // Title stage
+        stages.push({
+          type: "title",
+          name: person
+        });
+
+        // All image stages
+        const images = await getImagesForPerson(person);
+
+        images.forEach(src => {
+          stages.push({
+            type: "image",
+            name: person,
+            src
+          });
+        });
+      }
+
+      // =========================================================
+      // PAGE HEIGHT
+      // =========================================================
+
+      scrollSpace.style.height =
+        (stages.length * growDistance + window.innerHeight) + "px";
+
+      // =========================================================
+      // HELPERS
+      // =========================================================
+
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      // =========================================================
+      // UPDATE
+      // =========================================================
+
+      let currentImage = "";
+
+      function update() {
+
+        const scroll = window.scrollY;
+
+        const stageIndex = Math.floor(scroll / growDistance);
+
+        const safeStage =
+          Math.min(stageIndex, stages.length - 1);
+
+        const currentStage = stages[safeStage];
+
+        const stageStart = safeStage * growDistance;
+
+        const progress = clamp(
+          (scroll - stageStart) / growDistance,
+          0,
+          1
+        );
+
+        let eased = easeInOutCubic(progress);
+
+        // Extra acceleration
+        if (progress > 0.7) {
+          const boost = (progress - 0.7) / 0.3;
+          eased += boost * 1.2;
+        }
+
+        // =====================================================
+        // TITLE STAGE
+        // =====================================================
+
+        if (currentStage.type === "title") {
+
+          title.style.display = "flex";
+          title.textContent = currentStage.name;
+
+          const baseSize = window.innerWidth * 0.006;
+          const maxSize = baseSize * 400;
+
+          const size =
+            baseSize +
+            (maxSize - baseSize) * eased;
+
+          title.style.fontSize = size + "px";
+
+          let opacity = 1;
+
+          if (progress >= 0.98) {
+            opacity = 0;
+          }
+
+          title.style.opacity = opacity;
+
+          image.style.opacity = 0;
+
+          return;
+        }
+
+        // =====================================================
+        // IMAGE STAGE
+        // =====================================================
+
+        title.style.display = "none";
+
+        if (currentStage.src !== currentImage) {
+          currentImage = currentStage.src;
+          image.src = currentStage.src;
+        }
+
+        const scale = 1 + eased * 100;
 
         let opacity = 1;
+
+        if (progress < 0.08) {
+          opacity = progress / 0.08;
+        }
 
         if (progress >= 0.98) {
           opacity = 0;
         }
 
-        title.style.opacity = opacity;
+        image.style.opacity = clamp(opacity, 0, 1);
 
-        image.style.opacity = 0;
-        return;
+        image.style.transform =
+          `scale(${scale})`;
       }
 
-      // ❌ hide title
-      title.style.display = "none";
+      // =========================================================
+      // EVENTS
+      // =========================================================
 
-      // ✅ IMAGE STAGES
-      const imageIndex = stageInPerson;
+      window.addEventListener("scroll", update);
 
-      const fileName =
-        name.toLowerCase() + imageIndex + ".webp";
-
-      if (fileName !== currentImage) {
-        currentImage = fileName;
-        image.src = fileName;
-      }
-
-      const scale = 1 + eased * 100;
-
-      let opacity = 1;
-
-      if (progress < 0.08) {
-        opacity = progress / 0.08;
-      }
-
-      if (progress >= 0.98) {
-        opacity = 0;
-      }
-
-      image.style.opacity = clamp(opacity, 0, 1);
-      image.style.transform = `scale(${scale})`;
-    }
-
-    window.addEventListener("scroll", update);
-    update();
+      update();
+    });
   </script>
+
 </body>
 </html>
